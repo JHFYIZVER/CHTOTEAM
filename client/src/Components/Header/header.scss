@@ -1,0 +1,57 @@
+.burger {
+  position: fixed;
+  z-index: 1000;
+  cursor: pointer;
+
+  span {
+    position: absolute;
+    height: 2px;
+    border-radius: 10px;
+    transition: all 0.5s ease;
+
+    &:nth-child(1) {
+      width: 20px;
+      left: 0;
+      top: 0;
+    }
+    &:nth-child(2) {
+      width: 35px;
+      left: 0;
+      top: 15px;
+    }
+    &:nth-child(3) {
+      width: 20px;
+      top: 30px;
+      left: 15px;
+    }
+  }
+
+  &-open {
+    position: fixed;
+    z-index: 2000;
+    cursor: pointer;
+    left: 35px;
+
+    span {
+      position: absolute;
+      height: 2px;
+      border-radius: 10px;
+      transition: all 0.5s ease;
+      &:nth-child(1) {
+        top: 15px;
+        width: 35px;
+        left: 0;
+        transform: rotate(45deg);
+      }
+      &:nth-child(2) {
+        opacity: 0;
+      }
+      &:nth-child(3) {
+        top: 15px;
+        width: 35px;
+        left: 0;
+        transform: rotate(-45deg);
+      }
+    }
+  }
+}
