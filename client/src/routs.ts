@@ -22,7 +22,7 @@ export const privateRoutes = [{ pathL: ADMIN_ROUTE, Component: Admin }];
 
 export const publicRoutes = [
   { path: MAIN_ROUTE, Component: Main },
-  { path: GAME_ROUTE, Component: Game },
+  { path: GAME_ROUTE + "/:id", Component: Game },
   { path: LIBRARY_ROUTE, Component: Library },
   { path: NOT_FOUND_ROUTE, Component: NotFound },
   { path: STORE_ROUTE, Component: Store },

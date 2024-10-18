@@ -1,7 +1,7 @@
-import React from "react";
 import BtnMore from "../../Components/UI/Buttons/BtnMore";
 import MainCardList from "../../Components/MainCardList/MainCardList";
 import MainCategoryList from "../../Components/MainCategoryList/MainCategoryList";
+
 
 const Main = () => {
   return (

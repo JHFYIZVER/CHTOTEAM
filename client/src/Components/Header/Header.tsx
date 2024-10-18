@@ -5,7 +5,7 @@ import { Context } from "../../main";
 import { observer } from "mobx-react-lite";
 const Header = observer(() => {
   const { aside }: any = useContext(Context);
-  const clazz: string = "header bg-blue text-white fixed w-full z-10"
+  const clazz: string = "header bg-blue text-white fixed w-full z-10 transition-all ease-in-out duration-200";
 
   return (
     <header className={aside.isOpen ? clazz + " mx-[300px]" : clazz}>
