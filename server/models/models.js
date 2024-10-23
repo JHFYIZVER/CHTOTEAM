@@ -23,16 +23,11 @@ const Status = sequelize.define("status", {
   name: { type: DataTypes.STRING },
 }); // Статусы
 
-const StatusGame = sequelize.define("statusGame", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  gameId: { type: DataTypes.INTEGER },
-  statusId: { type: DataTypes.INTEGER },
-}); // Статус игры вышла, в процессе или нет
-
 const Game = sequelize.define("game", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   statusId: { type: DataTypes.INTEGER },
   tagId: { type: DataTypes.INTEGER },
+  typeId: { type: DataTypes.INTEGER },
   userId: { type: DataTypes.INTEGER },
   pictureGameId: { type: DataTypes.INTEGER },
   title: { type: DataTypes.STRING },
@@ -47,12 +42,6 @@ const Tag = sequelize.define("tag", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING },
 }); // Теги
-
-const GameTag = sequelize.define("gameTag", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  gameId: { type: DataTypes.INTEGER },
-  tagId: { type: DataTypes.INTEGER },
-}); // Теги игр
 
 const Comment = sequelize.define("comment", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -105,8 +94,12 @@ const UserScore = sequelize.define("userScore", {
 
 const Friends = sequelize.define("friends", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  userId: { type: DataTypes.INTEGER },
-  friendId: { type: DataTypes.INTEGER },
+  status: {
+    type: DataTypes.ENUM("pending", "accepted"),
+    defaultValue: "pending",
+  },
+  userId: { type: DataTypes.INTEGER }, // id текущего пользователя
+  friendId: { type: DataTypes.INTEGER }, // id другого пользователя
 }); // Друзья
 
 const UserGame = sequelize.define("userGame", {
@@ -126,19 +119,7 @@ const Type = sequelize.define("type", {
   name: { type: DataTypes.STRING },
 }); // Типы игр (Популярные, Новинки, Рекомендуемые и т.д.)
 
-const ConditionGame = sequelize.define("conditionGame", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  gameId: { type: DataTypes.INTEGER },
-  typeId: { type: DataTypes.INTEGER },
-}); // Список играю, буду играть, не играю
-
-const TypeGames = sequelize.define("typeGames", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  gameId: { type: DataTypes.INTEGER },
-  typeId: { type: DataTypes.INTEGER },
-}); // Типы игр (Популярные, Новинки, Рекомендуемые и т.д.)
-
-const verifyUser = sequelize.define("verifyUser", {
+const VerifyUser = sequelize.define("verifyUser", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   userId: { type: DataTypes.INTEGER },
   status: { type: DataTypes.BOOLEAN },
@@ -150,14 +131,14 @@ Profile.belongsTo(User);
 User.hasMany(UserGame, { foreignKey: "userId" });
 UserGame.belongsTo(User);
 
-User.hasMany(Friends, { foreignKey: "userId" });
+User.hasMany(Friends, { foreignKey: "userId", as: "friend" });
 Friends.belongsTo(User);
 
 User.hasMany(UserScore, { foreignKey: "userId" });
 UserScore.belongsTo(User);
 
-User.hasOne(verifyUser, { foreignKey: "userId" });
-verifyUser.belongsTo(User);
+User.hasOne(VerifyUser, { foreignKey: "userId" });
+VerifyUser.belongsTo(User);
 
 User.hasMany(Comment, { foreignKey: "userId" });
 Comment.belongsTo(User);
@@ -165,11 +146,8 @@ Comment.belongsTo(User);
 User.hasMany(ReplyComment, { foreignKey: "userId" });
 ReplyComment.belongsTo(User);
 
-Condition.hasMany(ConditionGame, { foreignKey: "conditionId" });
-ConditionGame.belongsTo(Condition);
-
-UserGame.hasOne(ConditionGame, { foreignKey: "conditionId" });
-ConditionGame.belongsTo(UserGame);
+UserGame.hasOne(Condition, { foreignKey: "conditionId" });
+Condition.belongsTo(UserGame);
 
 Profile.hasOne(UserPicture, { foreignKey: "profileId" });
 UserPicture.belongsTo(Profile);
@@ -180,17 +158,14 @@ GamePicture.belongsTo(Picture);
 Picture.hasOne(UserPicture, { foreignKey: "pictureId" });
 UserPicture.belongsTo(Picture);
 
-Tag.hasMany(GameTag, { foreignKey: "tagId" });
-GameTag.belongsTo(Tag);
-
 Game.hasMany(GamePicture, { foreignKey: "gameId" });
 GamePicture.belongsTo(Game);
 
 Game.hasMany(UserGame, { foreignKey: "gameId" });
 UserGame.belongsTo(Game);
 
-Game.hasMany(GameTag, { foreignKey: "gameId" });
-GameTag.belongsTo(Game);
+Game.hasMany(Tag, { foreignKey: "gameId" });
+Tag.belongsTo(Game);
 
 Game.hasOne(GameScore, { foreignKey: "gameId" });
 GameScore.belongsTo(Game);
@@ -198,20 +173,14 @@ GameScore.belongsTo(Game);
 Game.hasMany(Comment, { foreignKey: "gameId" });
 Comment.belongsTo(Game);
 
-Game.hasMany(TypeGames, { foreignKey: "gameId" });
-TypeGames.belongsTo(Game);
+Game.hasMany(Type, { foreignKey: "gameId" });
+Type.belongsTo(Game);
 
-Type.hasMany(TypeGames, { foreignKey: "typeId" });
-TypeGames.belongsTo(Type);
+Game.hasOne(Status, { foreignKey: "gameId" });
+Status.belongsTo(Game);
 
-Status.hasMany(StatusGame, { foreignKey: "statusId" });
-StatusGame.belongsTo(Status);
-
-Game.hasOne(StatusGame, { foreignKey: "gameId" });
-StatusGame.belongsTo(Game);
-
-Game.hasOne(ConditionGame, { foreignKey: "gameId" });
-ConditionGame.belongsTo(Game);
+Game.hasOne(Condition, { foreignKey: "gameId" });
+Condition.belongsTo(Game);
 
 Comment.hasMany(ReplyComment, { foreignKey: "commentId" });
 ReplyComment.belongsTo(Comment);
@@ -220,10 +189,8 @@ module.exports = {
   User,
   Profile,
   Status,
-  StatusGame,
   Game,
   Tag,
-  GameTag,
   Comment,
   ReplyComment,
   Picture,
@@ -233,9 +200,7 @@ module.exports = {
   UserScore,
   Friends,
   UserGame,
-  ConditionGame,
   Type,
   Condition,
-  TypeGames,
-  verifyUser,
+  VerifyUser,
 };

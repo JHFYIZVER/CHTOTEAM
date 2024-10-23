@@ -2,15 +2,7 @@ const ApiError = require("../errors/apiError");
 const uuid = require("uuid");
 const path = require("path");
 
-const {
-  Game,
-  GameTag,
-  GamePicture,
-  GameScore,
-  Comment,
-  ReplyComment,
-  Picture,
-} = require("../models/models");
+const { Game } = require("../models/models");
 
 class GameController {
   async create(req, res, next) {
@@ -18,35 +10,31 @@ class GameController {
       const {
         statusId,
         tagId,
+        typeId,
         userId,
+        pictureGameId,
         title,
-        shortDescription,
+        shortDiscription,
         description,
         videoSource,
         sourse,
       } = req.body;
       const { cover } = req.files;
-      const { picture } = req.files;
-      let coverName = uuid.v4() + ".jpg";
-      let pictureName = uuid.v4() + ".jpg";
+      let coverName = uuid.v4() + ".png";
       cover.mv(path.resolve(__dirname, "..", "static", "covers", coverName));
-      picture.mv(
-        path.resolve(__dirname, "..", "static", "pictures", pictureName)
-      );
-
       const game = await Game.create({
         statusId,
         tagId,
+        typeId,
         userId,
-        pictureGameId: pictureName,
+        pictureGameId,
         title,
-        shortDescription,
+        shortDiscription,
         description,
-        coverImage: coverName,
         videoSource,
         sourse,
+        coverName: coverName,
       });
-
       return res.json(game);
     } catch (e) {
       next(ApiError.badRequest(e.message));
