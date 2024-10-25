@@ -5,7 +5,26 @@ class CommentController {
   async create(req, res, next) {
     try {
       const { text, gameId, userId } = req.body;
-      const comment = await Comment.create({ text, gameId, userId });
+      if (!text) {
+        return next(ApiError.badRequest("Текст не может быть пустым"));
+      }
+      if (!gameId) {
+        return next(
+          ApiError.badRequest("Идентификатор игры не может быть пустым")
+        );
+      }
+      if (!userId) {
+        return next(
+          ApiError.badRequest("Идентификатор пользователя не может быть пустым")
+        );
+      }
+      const dataComment = new Date();
+      const comment = await Comment.create({
+        text,
+        gameId,
+        userId,
+        dataComment,
+      });
       return res.json(comment);
     } catch (e) {
       next(ApiError.badRequest(e.message));

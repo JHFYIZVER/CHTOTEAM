@@ -1,7 +1,14 @@
-const { User, Profile, Friends } = require("../models/models");
+const {
+  User,
+  Profile,
+  Friends,
+  UserScore,
+  UserPicture,
+} = require("../models/models");
 const ApiError = require("../errors/apiError");
 const { Op } = require("sequelize");
-
+const uuid = require("uuid");
+const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const generateJwt = (id, email, role) => {
@@ -32,22 +39,27 @@ class UserController {
       dataBirth,
       role,
     });
-    const profile = await Profile.create({ userId: user.id });
-    const token = generateJwt(user.id, user.email, user.role);
-    return res.json({ token, profile });
-  }
-  async login(req, res, next) {
-    const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return next(ApiError.internal("Пользователь не найден"));
-    }
-    let comparePassword = bcrypt.compareSync(password, user.password);
-    if (!comparePassword) {
-      return next(ApiError.internal("Указан неверный пароль"));
-    }
+    await Profile.create({ userId: user.id });
+    await UserScore.create({ userId: user.id });
     const token = generateJwt(user.id, user.email, user.role);
     return res.json({ token });
+  }
+  async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return next(ApiError.internal("Пользователь не найден"));
+      }
+      let comparePassword = bcrypt.compareSync(password, user.password);
+      if (!comparePassword) {
+        return next(ApiError.internal("Указан неверный пароль"));
+      }
+      const token = generateJwt(user.id, user.email, user.role);
+      return res.json({ token });
+    } catch (e) {
+      return next(ApiError.internal(e.message));
+    }
   }
   async check(req, res, next) {
     const token = generateJwt(req.user.id, req.user.email, req.user.role);
@@ -88,17 +100,39 @@ class UserController {
 
   async updateProfile(req, res, next) {
     const { id } = req.params;
-    const profile = await Profile.update(req.body, { where: { userId: id } });
-    if (!profile) {
-      return next(ApiError.badRequest("Профиль не найден"));
+    try {
+      const { photo } = req.files;
+      const photoName = uuid.v4() + ".png"; 
+      await photo.mv(
+        path.resolve(__dirname, "..", "static", "profile", photoName)
+      );
+
+      const profile = await Profile.findOne({ where: { userId: id } });
+      if (!profile) {
+        return next(ApiError.badRequest("Профиль не найден"));
+      }
+      const userPicture = await UserPicture.create({
+        profileId: profile.id,
+        url: photoName,
+      });
+      await Profile.update(
+        { UserPictureId: userPicture.id },
+        { where: { userId: id } }
+      );
+      const updatedProfile = await Profile.findOne({
+        where: { userId: id },
+        include: [{ model: UserPicture, as: "photo" }],
+      });
+
+      return res.json(updatedProfile);
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
     }
-    return res.json(profile);
   }
 
   async addFriend(req, res, next) {
     try {
-      const { id } = req.params;
-      const { friendId } = req.body;
+      const { id, friendId } = req.params;
       if (id == friendId) {
         return next(ApiError.badRequest("Невозможно добавить себя в друзья"));
       }
@@ -135,8 +169,8 @@ class UserController {
 
   async acceptFriendRequest(req, res, next) {
     try {
-      const { id } = req.params; // Получаем ID пользователя, которому отправлена заявка
-      const { friendId } = req.body; // Получаем ID пользователя, который отправил заявку
+      const { id, friendId } = req.params;
+
       const user = await User.findOne({ where: { id } }); // Находим пользователя, который хочет принять заявку
       if (!user) {
         return next(ApiError.badRequest("Пользователь не найден"));
@@ -170,8 +204,7 @@ class UserController {
 
   async deleteFriend(req, res, next) {
     try {
-      const { id } = req.params;
-      const { friendId } = req.body;
+      const { id, friendId } = req.params;
       const user = await User.findOne({ where: { id } });
       if (!user) {
         return next(ApiError.badRequest("Пользователь не найден"));
@@ -266,6 +299,26 @@ class UserController {
     } catch (e) {
       return next(ApiError.badRequest("Ошибка получения друзей"));
     }
+  }
+
+  async verifyUser(req, res, next) {
+    const { id } = req.params;
+    const user = await User.findOne({ where: { id } });
+    if (!user) {
+      return next(ApiError.badRequest("Пользователь не найден"));
+    }
+    user.verified = true;
+    await user.save();
+    return res.json({ message: "Пользователь подтвержден" });
+  }
+
+  async getProfile(req, res, next) {
+    const { id } = req.params;
+    const profile = await Profile.findOne({ where: { userId: id } });
+    if (!profile) {
+      return next(ApiError.badRequest("Профиль не найден"));
+    }
+    return res.json(profile);
   }
 }
 

@@ -4,8 +4,8 @@ const typesController = require("../controllers/typesController");
 const checkRoleMiddleware = require("../middleware/checkRoleMiddleware");
 
 router.get("/", typesController.getAll),
-  router.get("/:id", typesController.getOne),
-  router.post("/", checkRoleMiddleware("ADMIN"), typesController.create);
+router.get("/:id", typesController.getOne),
+router.post("/", checkRoleMiddleware("ADMIN"), typesController.create);
 router.put("/:id", typesController.update);
 router.delete("/:id", typesController.delete);
 
