@@ -50,19 +50,34 @@ const Comment = sequelize.define("comment", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   gameId: { type: DataTypes.INTEGER },
   userId: { type: DataTypes.INTEGER },
-  dataComment: { type: DataTypes.DATE },
   text: { type: DataTypes.STRING },
-  likes: { type: DataTypes.INTEGER, defaultValue: 0 },
-  dislikes: { type: DataTypes.INTEGER, defaultValue: 0 },
+  commentScoreId: { type: DataTypes.INTEGER },
 }); // Комментарии
 
 const ReplyComment = sequelize.define("replyComment", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   userId: { type: DataTypes.INTEGER },
   commentId: { type: DataTypes.INTEGER },
-  dataComment: { type: DataTypes.DATE },
   text: { type: DataTypes.STRING },
+  parentReplyId: { type: DataTypes.INTEGER, allowNull: true },
+  commentScoreId: { type: DataTypes.INTEGER },
 }); // Ответы к комментария
+
+const CommentScore = sequelize.define("commentScore", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  userId: { type: DataTypes.INTEGER },
+  commentId: { type: DataTypes.INTEGER },
+  likes: { type: DataTypes.INTEGER, defaultValue: 0 },
+  dislikes: { type: DataTypes.INTEGER, defaultValue: 0 },
+});
+
+const ReplyCommentScore = sequelize.define("replyCommentScore", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  userId: { type: DataTypes.INTEGER },
+  replyId: { type: DataTypes.INTEGER },
+  likes: { type: DataTypes.INTEGER, defaultValue: 0 },
+  dislikes: { type: DataTypes.INTEGER, defaultValue: 0 },
+});
 
 const GamePicture = sequelize.define("gamePicture", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -194,8 +209,23 @@ Condition.belongsTo(Game);
 Condition.hasMany(Game, { foreignKey: "conditionId" });
 Game.belongsTo(Condition);
 
-Comment.hasMany(ReplyComment, { foreignKey: "commentId" });
+Comment.hasMany(ReplyComment, { foreignKey: "commentId", as: "replies" });
 ReplyComment.belongsTo(Comment);
+
+Comment.hasMany(CommentScore, { foreignKey: "commentId" });
+CommentScore.belongsTo(Comment);
+
+ReplyComment.hasMany(ReplyComment, {
+  foreignKey: "parentReplyId",
+});
+
+ReplyComment.belongsTo(ReplyComment, {
+  foreignKey: "parentReplyId",
+  as: "parentReply",
+});
+
+ReplyComment.hasMany(ReplyCommentScore, { foreignKey: "replyId" });
+ReplyCommentScore.belongsTo(ReplyComment);
 
 TagGames.belongsToMany(TypeGame, { through: TagType });
 TypeGame.belongsToMany(TagGames, { through: TagType });
@@ -209,6 +239,8 @@ module.exports = {
   TagGames,
   Comment,
   ReplyComment,
+  CommentScore,
+  ReplyCommentScore,
   GamePicture,
   UserPicture,
   GameScore,

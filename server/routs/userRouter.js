@@ -1,6 +1,7 @@
 const Router = require("express");
 const router = new Router();
 const userController = require("../controllers/userController");
+const userGameController = require("../controllers/userGameController");
 const userRatingController = require("../controllers/usersRatingController");
 const authMiddleware = require("../middleware/authMiddleware");
 const checkRoleMiddleware = require("../middleware/checkRoleMiddleware");
@@ -19,14 +20,20 @@ router.get("/:id/friendRequest", userController.getAllFriendRequests);
 router.get("/:id/profile", userController.getProfile);
 router.put("/:id/profile", userController.updateProfile);
 router.put("/:id", userController.update);
-router.put("/:id/verify", checkRoleMiddleware("ADMIN") ,userController.verifyUser);
+router.put("/:id/verify",checkRoleMiddleware("ADMIN"),userController.verifyUser);
 router.delete("/:id", userController.delete);
 router.delete("/:id/friend/:friendId", userController.deleteFriend);
 
 // User Rating Router
 
-router.get("/:id/rating", authMiddleware, userRatingController.getUsersRating);
-router.put("/:id/rating/likes/:userId", authMiddleware, userRatingController.likeUserRating);
-router.put("/:id/rating/dislikes/:userId",authMiddleware, userRatingController.dislikeUserRating);
+router.get("/:id/rating", userRatingController.getUsersRating);
+router.put("/:id/rating/likes/:userId",userRatingController.likeUserRating);
+router.put("/:id/rating/dislikes/:userId",userRatingController.dislikeUserRating);
+
+// User Game Router
+
+router.post("/:id/userGame", userGameController.create);
+router.get("/:id/userGame", userGameController.getAll);
+router.delete("/:id/userGame", userGameController.delete);
 
 module.exports = router;
