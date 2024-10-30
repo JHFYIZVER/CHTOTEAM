@@ -1,9 +1,10 @@
 import BtnMore from "../../Components/UI/Buttons/BtnMore";
 import MainCardList from "../../Components/MainCardList/MainCardList";
 import MainCategoryList from "../../Components/MainCategoryList/MainCategoryList";
-
+import useTitle from "../../hooks/useTitle";
 
 const Main = () => {
+  useTitle("Главная");
   return (
     <main className="mr-[240px] mt-[66px]">
       <section className="main-game p-[10px]">

@@ -94,6 +94,7 @@ const UserPicture = sequelize.define("userPicture", {
 const GameScore = sequelize.define("gameScore", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   gameId: { type: DataTypes.INTEGER },
+  userId: { type: DataTypes.INTEGER },
   likes: { type: DataTypes.INTEGER, defaultValue: 0 },
   dislikes: { type: DataTypes.INTEGER, defaultValue: 0 },
 }); // Игровые рейтинги

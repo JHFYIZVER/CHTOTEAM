@@ -99,6 +99,56 @@ class GameController {
 
   async getAll(req, res, next) {
     try {
+      let { tagIds, typeIds, limit = 20, page = 1 } = req.query;
+      const offset = (page - 1) * limit;
+
+      if (tagIds) {
+        tagIds = JSON.parse(tagIds);
+      }
+
+      if (typeIds) {
+        typeIds = JSON.parse(typeIds);
+      }
+
+      const includeArr = [];
+
+      // Условие для фильтрации по тегам
+      if (tagIds) {
+        includeArr.push({
+          model: TagGames,
+          as: "tag_games",
+          where: { tagId: tagIds },
+          attributes: [],
+          required: true, // Обязательный JOIN
+        });
+      }
+
+      // Условие для фильтрации по типам
+      if (typeIds) {
+        includeArr.push({
+          model: TypeGame,
+          as: "type_games",
+          where: { typeId: typeIds },
+          attributes: [],
+          required: true, // Обязательный JOIN
+        });
+      }
+
+      // Запрос на получение игр с условием фильтрации
+      const games = await Game.findAndCountAll({
+        include: includeArr,
+        limit,
+        offset,
+        attributes: ["id", "title", "shortDiscription", "coverImage"],
+        group: ["game.id"],
+      });
+
+      const count = await Game.count({
+        include: includeArr,
+        distinct: true
+      });
+
+      return res.json({ count, rows: games.rows });
     } catch (e) {
       next(ApiError.badRequest(e.message));
     }
@@ -109,9 +159,9 @@ class GameController {
     const game = await Game.findOne({
       where: { id },
       include: [
-        { model: GamePicture, as: "photos" },
-        { model: TagGames, as: "tag_games" },
-        { model: TypeGame, as: "type_games" },
+        { model: GamePicture, as: "photos", attributes: ["url"] },
+        { model: TagGames, as: "tag_games", attributes: ["tagId"] },
+        { model: TypeGame, as: "type_games", attributes: ["typeId"] },
       ],
     });
     if (!game) {
@@ -120,9 +170,7 @@ class GameController {
     return res.json(game);
   }
 
-  async update(req, res) {
-    
-  }
+  async update(req, res) {}
 
   async delete(req, res, next) {
     try {
@@ -162,6 +210,9 @@ class GameController {
       );
       if (!userGame) {
         return next(ApiError.badRequest("Игра не найдена"));
+      }
+      if(conditionId == userGame.conditionId) {
+        return next(ApiError.badRequest("Такая игра уже есть"));
       }
       return res.json(userGame);
     } catch (e) {

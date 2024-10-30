@@ -5,6 +5,25 @@ class UserGameController {
   async create(req, res, next) {
     try {
       const { userId, conditionId, gameId } = req.body;
+      const game = await UserGame.findOne({
+        where: {
+          userId,
+          gameId,
+        },
+      });
+      if (game) {
+        return next(ApiError.badRequest("Игра уже добавлена"));
+      }
+
+      const condition = await Condition.findOne({
+        where: {
+          id: conditionId,
+        },
+      });
+      if (!condition) {
+        return next(ApiError.badRequest("Условие не найдено"));
+      }
+
       const userGame = await UserGame.create({
         userId,
         conditionId,
@@ -22,7 +41,7 @@ class UserGameController {
     try {
       const { id } = req.params;
       const userGame = await UserGame.destroy({
-        where: { id },
+        where: { gameId: id },
       });
       return res.json({
         userGame,
@@ -34,12 +53,20 @@ class UserGameController {
 
   async getAll(req, res, next) {
     try {
-      const { userId } = req.params;
+      const { id } = req.params;
       const userGames = await UserGame.findAll({
         where: {
-          userId,
+          userId: id,
         },
       });
+      const user = await User.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!user) {
+        return next(ApiError.badRequest("Пользователь не найден"));
+      }
       const playGames = userGames.filter(
         (userGame) => userGame.conditionId === 1
       );
@@ -54,8 +81,6 @@ class UserGameController {
       next(ApiError.badRequest(e.message));
     }
   }
-
-  
 }
 
 module.exports = new UserGameController();

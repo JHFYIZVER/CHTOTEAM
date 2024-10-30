@@ -4,7 +4,7 @@ const commentController = require("../controllers/commentController");
 const authMiddleware = require("../middleware/authMiddleware");
 
 router.get("/:id", commentController.getAll),
-router.get("/:id/replies", commentController.getReplies);
+router.get("/:id/reply", commentController.getReplies);
 router.post("/", commentController.create);
 router.delete("/:id", commentController.delete);
 router.post("/reply", commentController.createReply);

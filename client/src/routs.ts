@@ -8,13 +8,13 @@ import {
   STORE_ROUTE,
 } from "./Utils/const";
 
-import NotFound from "./Pages/404/NotFound";
-import Admin from "./Pages/Admin/Admin";
-import Game from "./Pages/Game/Game";
-import Library from "./Pages/Library/Library";
-import Main from "./Pages/Main/Main";
-import Profile from "./Pages/Profile/Profile";
-import Store from "./Pages/Store/Store";
+import NotFound from "./pages/404/NotFound";
+import Admin from "./pages/Admin/Admin";
+import Game from "./pages/Game/Game";
+import Library from "./pages/Library/Library";
+import Main from "./pages/Main/Main";
+import Profile from "./pages/Profile/Profile";
+import Store from "./pages/Store/Store";
 
 export const authRouts = [{ path: PROFILE_ROUTE, Component: Profile }];
 
