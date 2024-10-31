@@ -6,7 +6,7 @@ import {
   GAME_ROUTE,
   LIBRARY_ROUTE,
   STORE_ROUTE,
-} from "./Utils/const";
+} from "./utils/const";
 
 import NotFound from "./pages/404/NotFound";
 import Admin from "./pages/Admin/Admin";

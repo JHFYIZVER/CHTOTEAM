@@ -1,8 +1,8 @@
 import { createContext } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import AsideStore from "./Store/AsideStore.ts";
-import ModalStore from "./Store/ModalStore.ts";
+import AsideStore from "./shared/store/AsideStore.ts";
+import ModalStore from "./shared/store/ModalStore.ts";
 import App from "./App.tsx";
 
 import "./index.css";

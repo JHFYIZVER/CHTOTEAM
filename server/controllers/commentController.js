@@ -157,7 +157,7 @@ class CommentController {
       const comment = await Comment.findOne({ where: { id: commentId } });
 
       if (!comment) {
-        return res.json({message: "Комментарий не найден"});
+        return res.json({ message: "Комментарий не найден" });
       }
 
       if (page < 1 && limit < 1) {

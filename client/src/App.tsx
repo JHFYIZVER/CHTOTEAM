@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import AppRouter from "./Components/AppRouter";
-import AsideNav from "./Components/Aside/AsideNav/AsideNav";
-import AsideUser from "./Components/Aside/AsideUser/AsideUser";
-import Header from "./Components/Header/Header";
+
+import Header from "./shared/components/header/Header";
 
 import "./App.css";
+import AppRouter from "./shared/components/AppRouter";
+import AsideNav from "./shared/components/aside/AsideNav/AsideNav";
+import AsideUser from "./shared/components/aside/AsideUser/AsideUser";
 
 function App() {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
