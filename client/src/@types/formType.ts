@@ -1,10 +1,13 @@
-type formType = { 
-   name: string,
-   surname: string,
-   email: string,
-   data: string,
-   password: string,
-   comfirmPassword: string
-}
+export type registerFormType = {
+  name: string;
+  surname: string;
+  email: string;
+  data: string;
+  password: string;
+  comfirmPassword: string;
+};
 
-export default formType
+export type loginFormType = {
+  email: string;
+  password: string;
+};

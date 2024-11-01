@@ -11,6 +11,10 @@ export default {
         active: "#31295B",
         gray: "#76808C",
         input: "#393D5D",
+        tag: "#556772",
+        link: "#66C0F4",
+        discription: "#8F98A0",
+        red: "#F34D4D"
       },
       maxWidth: {
         sm: "480px",

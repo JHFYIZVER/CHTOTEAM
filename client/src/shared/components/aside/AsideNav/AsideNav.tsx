@@ -20,11 +20,11 @@ const AsideNav = observer(() => {
     "aside-nav h-svh bg-aside max-w-[300px] w-full fixed text-white z-1";
 
   return (
-    <div
+    <aside
       onClick={() => (aside.isOpen = false)}
       className={aside.isOpen ? "bg" : ""}
     >
-      <aside className={aside.isOpen ? clazz + " aside-nav-open" : clazz}>
+      <div className={aside.isOpen ? clazz + " aside-nav-open" : clazz}>
         <ul className="flex flex-col pt-[66px]">
           <NavLink
             to={MAIN_ROUTE}
@@ -51,8 +51,8 @@ const AsideNav = observer(() => {
             <img src={profileImg} alt="icon" /> Мой профиль
           </NavLink>
         </ul>
-      </aside>
-    </div>
+      </div>
+    </aside>
   );
 });
 

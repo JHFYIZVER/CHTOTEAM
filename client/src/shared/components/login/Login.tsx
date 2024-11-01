@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler, SubmitErrorHandler } from "react-hook-form";
-import formType from "../../../@types/formType";
+import { loginFormType } from "../../../@types/formType";
 import useDebounce from "../../../hooks/useDebounce";
 
 const Login = () => {
-  const [formData, setFormData] = useState<formType>({} as formType);
+  const [formData, setFormData] = useState<loginFormType>({} as loginFormType);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<formType>();
+  } = useForm<loginFormType>();
   const clazz: string =
     "max-w-[400px] w-full text-center bg-input font-bold text-white py-3 outline-none rounded-bigBtn";
 
@@ -23,11 +23,11 @@ const Login = () => {
     setFormData(debouncedData);
   }, [debouncedData]);
 
-  const submit: SubmitHandler<formType> = (data: formType) => {
+  const submit: SubmitHandler<loginFormType> = (data: loginFormType) => {
     console.log(data);
   };
 
-  const error: SubmitErrorHandler<formType> = (errors) => {
+  const error: SubmitErrorHandler<loginFormType> = (errors) => {
     console.log(errors);
   };
 
@@ -58,7 +58,7 @@ const Login = () => {
           type="password"
           placeholder="Пароль"
           autoComplete="off"
-          {...register("password", { required: true })}
+          {...register("password", { required: true, minLength: 6 })}
           aria-invalid={errors.password ? "true" : "false"}
           onChange={onChange}
         />

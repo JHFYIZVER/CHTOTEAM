@@ -1,5 +1,5 @@
-import formType from "../../../@types/formType";
 import useDebounce from "../../../hooks/useDebounce";
+import { registerFormType } from "../../../@types/formType";
 import { useForm, SubmitHandler, SubmitErrorHandler } from "react-hook-form";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
@@ -9,12 +9,12 @@ const Register = observer(() => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<formType>();
+  } = useForm<registerFormType>();
 
   const clazz: string =
     "max-w-[400px] w-full text-center bg-input font-bold text-white py-3 outline-none rounded-bigBtn";
 
-  const [formData, setFormData] = useState<formType>({} as formType);
+  const [formData, setFormData] = useState<registerFormType>({} as registerFormType);
   const debouncedData = useDebounce(formData, 300);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,11 +25,11 @@ const Register = observer(() => {
     setFormData(debouncedData);
   }, [debouncedData]);
 
-  const submit: SubmitHandler<formType> = (data: formType) => {
+  const submit: SubmitHandler<registerFormType> = (data: registerFormType) => {
     console.log(data);
   };
 
-  const error: SubmitErrorHandler<formType> = (errors) => {
+  const error: SubmitErrorHandler<registerFormType> = (errors) => {
     console.log(errors);
   };
 

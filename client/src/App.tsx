@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-
 import Header from "./shared/components/header/Header";
-
-import "./App.css";
 import AppRouter from "./shared/components/AppRouter";
 import AsideNav from "./shared/components/aside/AsideNav/AsideNav";
 import AsideUser from "./shared/components/aside/AsideUser/AsideUser";
+
+import "./App.css";
 
 function App() {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
